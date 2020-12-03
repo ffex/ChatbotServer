@@ -71,7 +71,7 @@ namespace ChatbotServer
                     sendBuff = Encoding.ASCII.GetBytes(sendString);
 
                     //invio al client il messaggio
-                    sendedBytes=client.Send(sendBuff);
+                    client.Send(sendBuff);
 
                     Array.Clear(sendBuff, 0, sendBuff.Length);
                     Array.Clear(recvBuff, 0, recvBuff.Length);
