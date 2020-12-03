@@ -33,15 +33,16 @@ namespace ChatbotServer
             listenerSocket.Listen(5);
             Console.WriteLine("Server in ascolto...");
             Console.WriteLine("in attesa di connessione da parte del client...");
-            // Istruzione bloccante
-            // restituisce una variabile di tipo socket.
+            
             try {
+                // Istruzione bloccante
+                // restituisce una variabile di tipo socket.
                 Socket client = listenerSocket.Accept();
 
                 Console.WriteLine("Client IP: " + client.RemoteEndPoint.ToString());
 
 
-                
+                //dichiarazione variabili che userò nel ciclo
                 byte[] recvBuff = new byte[128];
                 byte[] sendBuff = new byte[128];
                 int recvBytes = 0;
@@ -49,13 +50,15 @@ namespace ChatbotServer
                 string recvString="", sendString="";
 
                 while (true) { 
+                    //ricevo il messaggio dal client
                     recvBytes = client.Receive(recvBuff);
                     recvString = Encoding.ASCII.GetString(recvBuff, 0, recvBytes);
                     Console.WriteLine("Client: " + recvString);
                 
-                    
+                    //Controllo la stringa che mi è arrivata. in base a questa scelgo la risposta
                     if (recvString.ToUpper().Trim() == "QUIT")
                     {
+                        //interrompo il ciclo in quanto il comando che mi è arrivato è l'ordine di uscita
                         break;
                     }else if(recvString.ToUpper().Trim() == "CIAO"){
                         sendString="ciao";   
@@ -72,7 +75,7 @@ namespace ChatbotServer
 
                     //invio al client il messaggio
                     client.Send(sendBuff);
-
+                    // Pulizia variabili
                     Array.Clear(sendBuff, 0, sendBuff.Length);
                     Array.Clear(recvBuff, 0, recvBuff.Length);
                     sendString="";
@@ -80,6 +83,7 @@ namespace ChatbotServer
                     recvBytes=0;
                 }
          }catch(Exception ex){
+                //intercetto gli errori
                 Console.WriteLine(ex.Message);
          }
             Console.WriteLine("Programma terminato. Premere Enter per uscire...");
