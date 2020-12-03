@@ -35,45 +35,55 @@ namespace ChatbotServer
             Console.WriteLine("in attesa di connessione da parte del client...");
             // Istruzione bloccante
             // restituisce una variabile di tipo socket.
-            Socket client = listenerSocket.Accept();
+            try {
+                Socket client = listenerSocket.Accept();
 
-            Console.WriteLine("Client IP: " + client.RemoteEndPoint.ToString());
+                Console.WriteLine("Client IP: " + client.RemoteEndPoint.ToString());
 
-            // mi attrezzo per ricevere un messaggio dal client
-            // siccome è di tipo stream io riceverò dei byte, o meglio un byte array
-            // riceverò anche il numero di byte.
-            byte[] buff = new byte[128];
-            int receivedBytes = 0;
-            int sendedBytes = 0;
-            string receivedString, sendString;
 
-            while (true) { 
-                receivedBytes = client.Receive(buff);
-                Console.WriteLine("Numero di byte ricevuti: " + receivedBytes);
-                receivedString = Encoding.ASCII.GetString(buff, 0, receivedBytes);
-                Console.WriteLine("Stringa ricevuta: " + receivedString);
                 
-                if (receivedString.ToUpper() == "QUIT")
-                {
-                    break;
+                byte[] recvBuff = new byte[128];
+                byte[] sendBuff = new byte[128];
+                int recvBytes = 0;
+            
+                string recvString="", sendString="";
+
+                while (true) { 
+                    recvBytes = client.Receive(recvBuff);
+                    recvString = Encoding.ASCII.GetString(recvBuff, 0, recvBytes);
+                    Console.WriteLine("Client: " + recvString);
+                
+                    
+                    if (recvString.ToUpper().Trim() == "QUIT")
+                    {
+                        break;
+                    }else if(recvString.ToUpper().Trim() == "CIAO"){
+                        sendString="ciao";   
+                    }else if(recvString.ToUpper().Trim() == "COME VA?"){
+                        sendString="bene!";   
+                    }else if(recvString.ToUpper().Trim() == "CHE FAI?"){
+                        sendString="niente";   
+                    }else{
+                        sendString="Non ho capito.";
+                    }
+
+                    // lo converto in byte
+                    sendBuff = Encoding.ASCII.GetBytes(sendString);
+
+                    //invio al client il messaggio
+                    sendedBytes=client.Send(sendBuff);
+
+                    Array.Clear(sendBuff, 0, sendBuff.Length);
+                    Array.Clear(recvBuff, 0, recvBuff.Length);
+                    sendString="";
+                    recvString="";
+                    recvBytes=0;
                 }
-
-                Array.Clear(buff, 0, buff.Length);
-                sendedBytes = 0;
-
-                // crea il messaggio
-                sendString = "Benvenuto client";
-
-                // lo converto in byte
-                buff = Encoding.ASCII.GetBytes(sendString);
-
-                //invio al client il messaggio
-                sendedBytes=client.Send(buff);
-
-                Array.Clear(buff, 0, buff.Length);
-
-            }
-            // Termina il programma
+         }catch(Exception ex){
+                Console.WriteLine(ex.Message);
+         }
+            Console.WriteLine("Programma terminato. Premere Enter per uscire...");
+            Console.ReadLine();
 
 
         }
